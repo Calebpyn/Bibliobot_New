@@ -18,12 +18,28 @@ function Home() {
 
   const [textVal, setTextVal] = useState("");
 
+  const [aiRes, setAiRes] = useState("");
+
+  const [dbRes, setDbRes] = useState("");
+
   useEffect(() => {
     setTextVal(text);
     if (text != "") {
-      handleOpenAi();
+        generateResponse();
     }
   }, [text]);
+
+  useEffect(() => {
+    if(aiRes != ""){
+        handleDb(aiRes);
+    }
+  }, [aiRes])
+
+  useEffect(() => {
+    if (dbRes != "") {
+        handleCleanRes(dbRes);
+    }
+  }, [dbRes])
 
   const handleOpenAi = async () => {
     console.log("fetching open ai endpoint...");
@@ -41,10 +57,62 @@ function Home() {
 
       const data = await response.json();
 
+      const newData = data.toLowerCase();
+
+      setAiRes(newData);
+
+    } catch (err) {
+      console.log(err);
+    }
+  };
+  
+  const handleDb = async (queryRes) => {
+    const newQuery = queryRes.substring(1)
+    const dummy = {
+        query: newQuery,
+    }
+    try {
+        const data = await fetch(`${actualUrl}/query`, {
+            method: "POST",
+            body: JSON.stringify(dummy),
+            headers: { "Content-Type": "application/json" },
+        })
+
+        const dataRes = await data.json();
+
+        setDbRes(dataRes);
+
+    } catch(err) {
+        console.log(err)
+    }
+    
+  }
+
+  const handleCleanRes = async (textToClear) => {
+    console.log("fetching open ai endpoint...");
+
+    try {
+      const bodyText = {
+        text: textToClear,
+        ogPropmt: text,
+      };
+
+      const response = await fetch(`${actualUrl}/clear`, {
+        method: "POST",
+        body: JSON.stringify(bodyText),
+        headers: { "Content-Type": "application/json" },
+      });
+
+      const data = await response.json();
+
       setTextVal(data);
     } catch (err) {
       console.log(err);
     }
+  };
+
+  const generateResponse = () => {
+    handleOpenAi();
   };
 
   return (
