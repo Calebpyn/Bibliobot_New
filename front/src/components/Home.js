@@ -41,7 +41,7 @@ function Home() {
 
       const data = await response.json();
 
-      setTextVal(data.content);
+      setTextVal(data);
     } catch (err) {
       console.log(err);
     }
