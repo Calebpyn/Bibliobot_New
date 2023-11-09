@@ -3,5 +3,14 @@
 @tailwind utilities;
 
 .smooth {
-  transition: all ease .3s;
+  transition: all ease 0.3s;
+}
+.blue-circle {
+  animation-delay: 0.1s;
+}
+.green-circle {
+  animation-delay: 0.2s;
+}
+.red-circle {
+  animation-delay: 0.3s;
 }

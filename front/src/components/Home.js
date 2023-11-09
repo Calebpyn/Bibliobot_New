@@ -15,6 +15,7 @@ function Home() {
   } = useSpeechRecognition();
 
   const [textArea, setTextArea] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const [textVal, setTextVal] = useState("");
 
@@ -48,7 +49,7 @@ function Home() {
       const bodyText = {
         text: text,
       };
-
+      setLoading(true);
       const response = await fetch(`${actualUrl}/chat`, {
         method: "POST",
         body: JSON.stringify(bodyText),
@@ -57,11 +58,13 @@ function Home() {
 
       const data = await response.json();
 
+      setLoading(false);
+      setTextVal(data.content);
       const newData = data.toLowerCase();
 
       setAiRes(newData);
-
     } catch (err) {
+      alert("Error al conectar con el servidor");
       console.log(err);
     }
   };
@@ -155,20 +158,44 @@ function Home() {
           />
         </div>
       </div>
-
-      <div className="h-[35%] w-full flex justify-center items-center">
-        <textarea
-          className={
-            !textArea
-              ? "w-0 smooth py-6"
-              : "w-2/3 py-6 px-10 rounded-full smooth shadow-2xl"
-          }
-          readOnly
-          value={textVal}
-        ></textarea>
+      <div className="absolute w-full flex justify-center items-center">
+        <LoadingComponent isLoading={loading} />
+      </div>
+      <div className="h-[35%] w-full flex flex-col justify-center items-center ">
+        <div className=" w-2/3 mb-[20px] flex flex-col justify-between gap-4">
+          {text && (
+            <div className="w-full flex">
+              <div className=" bg-white/90 w-fit px-10 py-3 rounded-3xl rounded-tl-none max-w-[50%]">
+                {text}
+              </div>
+            </div>
+          )}
+          {textVal && loading == false && (
+            <div className="w-full flex justify-end">
+              <div className=" bg-white/90 w-fit px-10 py-3 rounded-3xl rounded-tr-none max-w-[50%]">
+                {textArea ? textVal : ""}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
 }
+
+const LoadingComponent = ({ isLoading }) => {
+  return (
+    <div
+      className={
+        `bg-white flex space-x-2 px-5 py-2 rounded-full justify-center items-center w-30 shadow-lg w-fit duration-100` +
+        (isLoading ? " opacity-100" : " opacity-0")
+      }
+    >
+      <div className="bg-blue-600 p-2 w-4 h-4 rounded-full animate-bounce blue-circle"></div>
+      <div className="bg-green-600 p-2 w-4 h-4 rounded-full animate-bounce green-circle"></div>
+      <div className="bg-red-600 p-2 w-4 h-4 rounded-full animate-bounce red-circle"></div>
+    </div>
+  );
+};
 
 export default Home;
