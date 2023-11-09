@@ -67,10 +67,16 @@ function Home() {
   };
   
   const handleDb = async (queryRes) => {
-    const newQuery = queryRes.substring(1)
-    const dummy = {
-        query: newQuery,
+    var dummy = {
+        query: queryRes,
     }
+    if (queryRes[0] == "#"){
+        const newQuery = queryRes.substring(1)
+        dummy = {
+            query: newQuery,
+        }
+    }
+    
     try {
         const data = await fetch(`${actualUrl}/query`, {
             method: "POST",
@@ -80,7 +86,7 @@ function Home() {
 
         const dataRes = await data.json();
 
-        setDbRes(dataRes);
+        setDbRes(JSON.stringify(dataRes));
 
     } catch(err) {
         console.log(err)
