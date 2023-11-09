@@ -15,6 +15,7 @@ function Home() {
   } = useSpeechRecognition();
 
   const [textArea, setTextArea] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const [textVal, setTextVal] = useState("");
 
@@ -32,7 +33,7 @@ function Home() {
       const bodyText = {
         text: text,
       };
-
+      setLoading(true);
       const response = await fetch(`${actualUrl}/chat`, {
         method: "POST",
         body: JSON.stringify(bodyText),
@@ -40,9 +41,10 @@ function Home() {
       });
 
       const data = await response.json();
-
+      setLoading(false);
       setTextVal(data.content);
     } catch (err) {
+      alert("Error al conectar con el servidor");
       console.log(err);
     }
   };
@@ -81,7 +83,9 @@ function Home() {
           />
         </div>
       </div>
-
+      <div className="w-full flex justify-center items-center">
+        <LoadingComponent isLoading={loading} />
+      </div>
       <div className="h-[35%] w-full flex justify-center items-center">
         <textarea
           className={
@@ -96,5 +100,20 @@ function Home() {
     </div>
   );
 }
+
+const LoadingComponent = ({ isLoading }) => {
+  return (
+    <div
+      className={
+        `bg-white flex space-x-2 px-5 py-2 rounded-full justify-center items-center w-30 border-2 w-fit duration-100` +
+        (isLoading ? " opacity-100" : " opacity-0")
+      }
+    >
+      <div className="bg-blue-600 p-2 w-4 h-4 rounded-full animate-bounce blue-circle"></div>
+      <div className="bg-green-600 p-2 w-4 h-4 rounded-full animate-bounce green-circle"></div>
+      <div className="bg-red-600 p-2 w-4 h-4 rounded-full animate-bounce red-circle"></div>
+    </div>
+  );
+};
 
 export default Home;
